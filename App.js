@@ -3,13 +3,14 @@ import { Image, Text, View, TextInput, KeyboardAvoidingView, TouchableWithoutFee
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AUTH } from './firebase';
-import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-import { useState, useEffect, useCallback } from 'react';
-import { StyledButtonMain, ViewBg, styles, StyledButtonTre } from './styles';
+import { onAuthStateChanged } from 'firebase/auth';
+import { useState, useEffect } from 'react';
+import { styles } from './styles';
 import { SignIn } from './views/signin';
 import { createStackNavigator } from '@react-navigation/stack';
 import Constants from 'expo-constants'
-
+import { Map } from './components/map';
+import { Emergency } from './components/emergency';
 import {
   useFonts,
   Montserrat_100Thin,
@@ -25,13 +26,9 @@ import {
 import { TopBar } from './components/topBar';
 // import { useState } from 'react';
 
-function HomeScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Casa!</Text>
-    </View>
-  );
-}
+
+
+
 
 function SettingsScreen() {
   return (
@@ -49,10 +46,6 @@ export default function App() {
   useEffect(() => {
     onAuthStateChanged(auth, (a => setUser(a)))
   }, [])
-  const signIn = async (data) => {
-    console.log(data)
-    // await signInWithEmailAndPassword(auth, 'simonpineda0521@gmial.com', 'Simonp21')
-  }
   let [fontsLoaded] = useFonts({
     Montserrat_100Thin,
     Montserrat_200ExtraLight,
@@ -67,37 +60,39 @@ export default function App() {
     <>
       <NavigationContainer>
         <StatusBar barStyle='dark-content' />
-        {!user ?
+        {user ?
           <>
             <TopBar />
-            <Tab.Navigator screenOptions={({ route }) => ({
+            <Tab.Navigator initialRouteName='Emergencias' screenOptions={({ route }) => ({
               // headerShown: false,
               tabBarStyle: {
-                height: 95,
+                height: Constants.statusBarHeight + 70,
                 // paddingHorizontal: 5,
 
                 backgroundColor: '#011C40',
-                paddingBottom: 30
+                paddingTop: 20,
+                // paddingBottom: 5,
+                paddingBottom: Constants.statusBarHeight
               },
-              
+
               tabBarIcon: ({ focused }) => {
 
 
                 if (route.name === 'Hospitales') {
-                  return <Image style={focused? styles.topBarIcons: styles.topBarIconsToSelect} source={require(`./img/hospital.png`)} />;
+                  return <Image style={focused ? styles.topBarIcons : styles.topBarIconsToSelect} source={require(`./img/hospital.png`)} />;
                 }
-                else if (route.name === 'Emergencias'){
-                    return <Image style={focused? styles.topBarIcons: styles.topBarIconsToSelect}source={require(`./img/bone-break.png`)} />;
+                else if (route.name === 'Emergencias') {
+                  return <Image style={focused ? styles.topBarIcons : styles.topBarIconsToSelect} source={require(`./img/bone-break.png`)} />;
                 }
-                return <Image style={focused? styles.topBarIcons: styles.topBarIconsToSelect} source={require(`./img/people-roof.png`)} />;
+                return <Image style={focused ? styles.topBarIcons : styles.topBarIconsToSelect} source={require(`./img/people-roof.png`)} />;
               },
-              tabBarLabel: ({focused, color, size}) => (
-                <Text style={{color: focused ? '#F2EED8' : color, fontFamily: 'Montserrat_500Medium', fontSize:13}}>{route.name}</Text>
+              tabBarLabel: ({ focused, color, size }) => (
+                <Text style={{ color: focused ? '#F2EED8' : color, fontFamily: 'Montserrat_500Medium', fontSize: 13 }}>{route.name}</Text>
               ),
             })}>
-              <Tab.Screen options={{ headerShown: false }} name="Familia" component={HomeScreen} />
-              <Tab.Screen options={{ headerShown: false }} name="Emergencias" component={HomeScreen} />
-              <Tab.Screen options={{ headerShown: false }} name="Hospitales" component={SettingsScreen} />
+              <Tab.Screen options={{ headerShown: false }} name="Familia" component={SettingsScreen} />
+              <Tab.Screen options={{ headerShown: false }} name="Emergencias" component={Emergency} />
+              <Tab.Screen options={{ headerShown: false }} name="Hospitales" component={Map} />
             </Tab.Navigator>
           </>
           :
